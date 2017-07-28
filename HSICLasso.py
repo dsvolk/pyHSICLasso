@@ -42,8 +42,8 @@ def hsiclasso(Xin,Yin,numFeat=10,ykernel='Gauss'):
     c = Xty - XtXbeta
     j = c.argmax()
     C = c[j]
-    A.append(j)
-    I.remove(j)
+    A.append(I[j])
+    I.remove(I[j])
 
     inc_path = True
     k = 0
@@ -64,9 +64,9 @@ def hsiclasso(Xin,Yin,numFeat=10,ykernel='Gauss'):
         XtXw = np.dot(X.transpose(),np.dot(X[:,A],w))
 
         gamma1 = (C - c[I])/(XtXw[A[0]] - XtXw[I])
-        gamma2 = -beta[A]/(w + 1e-10)
+        gamma2 = -beta[A]/(w)
         gamma3 = np.zeros((1,1))
-        gamma3[0] = c[A[0]]/(XtXw[A[0]] + 1e-10)
+        gamma3[0] = c[A[0]]/(XtXw[A[0]])
         gamma = np.concatenate((np.concatenate((gamma1,gamma2)),gamma3))
 
         gamma[gamma <= 1e-9] = np.inf
@@ -77,9 +77,9 @@ def hsiclasso(Xin,Yin,numFeat=10,ykernel='Gauss'):
 
         if t > len(gamma1) and t < (len(gamma1) + len(gamma2) + 1):
             lassocond = 1
-            j = t - len(gamma1)
+            j = t - len(gamma1) - 1
             I.append(A[j])
-            A.remove(j)
+            A.remove(A[j])
         else:
             lassocond = 0
 
