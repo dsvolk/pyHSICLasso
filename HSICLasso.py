@@ -75,9 +75,9 @@ def hsiclasso(Xin,Yin,numFeat=10,ykernel='Gauss'):
 
         beta[A] = beta[A] + mu*w
 
-        if t > len(gamma1) and t < (len(gamma1) + len(gamma2) + 1):
+        if t >= len(gamma1) and t < (len(gamma1) + len(gamma2) + 1):
             lassocond = 1
-            j = t - len(gamma1) - 1
+            j = t - len(gamma1)
             I.append(A[j])
             A.remove(A[j])
         else:
