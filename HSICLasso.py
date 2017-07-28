@@ -13,10 +13,11 @@ def hsiclasso(Xin,Yin,numFeat=10,ykernel='Gauss'):
     H = np.eye(n) - 1.0/float(n)*np.ones(n)
 
     #Normalization
-    XX = Xin/(Xin.std(1)[:,None]+0.00001)
+    XX = Xin/(Xin.std(1)[:,None])*np.sqrt(float(n-1)/(n))
+
 
     if ykernel == 'Gauss':
-        YY = Yin/(Yin.std(1)[:,None]+0.00001)
+        YY = Yin/(Yin.std(1)[:,None]+10e-20)*np.sqrt(float(n-1)/(n))
         L = kernel_Gaussian(YY,YY,1.0)
     else:
         L = kernel_Delta_norm(Yin,Yin)
@@ -60,7 +61,7 @@ def hsiclasso(Xin,Yin,numFeat=10,ykernel='Gauss'):
 
         s = np.ones((len(A),1))
         #w = np.linalg.solve(np.dot(X[:,A].transpose(),X[:,A])+1e-10*np.eye(len(A)),s)
-        w = np.dot(np.linalg.pinv(np.dot(X[:,A].transpose(),X[:,A])),s)
+        w = np.linalg.solve(np.dot(X[:,A].transpose(),X[:,A]),s)
         XtXw = np.dot(X.transpose(),np.dot(X[:,A],w))
 
         gamma1 = (C - c[I])/(XtXw[A[0]] - XtXw[I])
@@ -74,12 +75,15 @@ def hsiclasso(Xin,Yin,numFeat=10,ykernel='Gauss'):
         mu = min(gamma)
 
         beta[A] = beta[A] + mu*w
+        #print beta[A]
+        #print t, len(gamma1), (len(gamma1) + len(gamma2) + 1)
 
-        if t >= len(gamma1) and t < (len(gamma1) + len(gamma2) + 1):
+        if t >= len(gamma1) and t < (len(gamma1) + len(gamma2)):
             lassocond = 1
             j = t - len(gamma1)
             I.append(A[j])
             A.remove(A[j])
+
         else:
             lassocond = 0
 
